@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, render_template, redirect, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
+from os import urandom
 
 app = Flask(__name__)
 
@@ -21,9 +22,9 @@ class Book(db.Model):
     author = db.Column(db.String(120), nullable=False)
     isbn = db.Column(db.Integer, unique=True)
 
-    def __init__(self, title, author)
-    self.title = title
-    self.author = author
+    def __init__(self, title, author):
+        self.title = title
+        self.author = author
 
     def __repr__(self):
         return '<Book. Title: {0} Author: {1}>'.format(self.title, self.author)
@@ -32,7 +33,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(60))
-    email = db.Column(db.String(60), unique=True nullable=False)
+    email = db.Column(db.String(60), unique=True, nullable=False)
+    salt = db.Column(db.Integer, unique=True, nullable=False)
     hashed_pass = db.Column(db.String(60), nullable=False)
 
     def __init__(self, first_name, last_name, email, hashed_pass):
@@ -46,8 +48,8 @@ class User(db.Model):
 
 class ReadingList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, ForeignKey('book.id'))
-    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, book_id, user_id):
         self.book_id = book_id
@@ -61,6 +63,47 @@ class ReadingList(db.Model):
 #routes: index, reading now, coming up, full list, settings (sub settings 
 # options for weights, categories, priorities, ratios?), subscribable 
 # reading lists, . . .
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    user = session['user']
+    current_list = ReadingList.query.filter_by(user_id=user.id)
+    return render_template('home.html')
+'''
+@app.before_request
+def require_login():
+    if not session['user'] and routes.endpoint not in ['login', 'register']:
+        return redirect('/login')
+'''
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        email = request.form['email']
+        password = request.form['password']
+
+        if not User.query.filter_by(email=email):
+            flash('Invalid username or password.')
+            return render_template('login.html')
+
+        user = User.query.filter_by(email=email)
+        # password = hash_func(password)
+
+        if password != user.hashed_pass:
+            flash('Invalid username or password.')
+            return render_template('login.html')
+
+        session['user'] = user.email
+        return redirect('/')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    # gen salt with urandom (at least as long as hash)
+    # hash password + salt
+    # store salt and hashed_pass in db
 
 
 if __name__ == '__main__':
