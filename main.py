@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from os import urandom
-
+from werkzeug import security
 app = Flask(__name__)
 
 
@@ -90,9 +89,9 @@ def login():
             return render_template('login.html')
 
         user = User.query.filter_by(email=email)
-        # password = hash_func(password)
 
-        if password != user.hashed_pass:
+
+        if not security.check_password_hash(user.hash, password):
             flash('Invalid username or password.')
             return render_template('login.html')
 
@@ -101,6 +100,7 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    # pull data from form
     # gen salt with urandom (at least as long as hash)
     # hash password + salt
     # store salt and hashed_pass in db
