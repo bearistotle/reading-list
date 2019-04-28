@@ -1,62 +1,12 @@
-from flask import Flask, render_template, redirect, request, session, flash
+from flask import Flask, render_template, redirect, request, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.validators import InputRequired, Length, Email, EqualTo
 from werkzeug import security
-app = Flask(__name__)
-
-
-app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://reading-list:4books@localhost:8889/reading-list'
-app.config['SQLALCHEMY_ECHO'] = True
-
-app.secret_key = '2d6Wz5oVayqYKZr'
-
-db = SQLAlchemy(app)
-
-
-# classes: User, Book, Recommendations?, Reading Lists? (for users to subscribe to)
-
-class Book(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(150), nullable=False)
-    author = db.Column(db.String(120), nullable=False)
-    isbn = db.Column(db.Integer, unique=True)
-
-    def __init__(self, title, author):
-        self.title = title
-        self.author = author
-
-    def __repr__(self):
-        return '<Book. Title: {0} Author: {1}>'.format(self.title, self.author)
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(30))
-    last_name = db.Column(db.String(60))
-    email = db.Column(db.String(60), unique=True, nullable=False)
-    salt = db.Column(db.Integer, unique=True, nullable=False)
-    hashed_pass = db.Column(db.String(60), nullable=False)
-
-    def __init__(self, first_name, last_name, email, hashed_pass):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.hashed_pass = hashed_pass
-
-    def __repr__(self):
-        return '<User. ID: {0} Email: {1}'.format(self.id, self.email)
-
-class ReadingList(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-    def __init__(self, book_id, user_id):
-        self.book_id = book_id
-        self.user_id = user_id
-
-    def __repr__(self):
-        return '<ReadingList. Book: {0} User: {1}'.format(self.book_id, self.user_id)
-
+from app import db, app
+from models import User, Book
+from forms import LoginForm, RegistrationForm
 
 
 #routes: index, reading now, coming up, full list, settings (sub settings 
@@ -67,44 +17,76 @@ class ReadingList(db.Model):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    user = session['user']
-    current_list = ReadingList.query.filter_by(user_id=user.id)
+    email = session['user']
+    user = User.query.filter_by(email=email).first()
+    current_list = Book.query.filter_by(reader=user.id)
     return render_template('home.html')
-'''
+
 @app.before_request
 def require_login():
-    if not session['user'] and routes.endpoint not in ['login', 'register']:
+    if not ('user' in session or request.endpoint in ['login', 'register']):
         return redirect('/login')
-'''
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login.html', title='Log In', form=form)
+
     else:
-        email = request.form['email']
-        password = request.form['password']
+        email = form.email.data
+        password = form.password.data
 
         if not User.query.filter_by(email=email):
             flash('Invalid username or password.')
-            return render_template('login.html')
+            return render_template('login.html', title='Log In', form=form)
 
-        user = User.query.filter_by(email=email)
+        user = User.query.filter_by(email=email).first()
 
 
-        if not security.check_password_hash(user.hash, password):
+        if not security.check_password_hash(user.hashed_pass, password):
             flash('Invalid username or password.')
-            return render_template('login.html')
+            return render_template('login.html', title='Log In', form=form)
 
-        session['user'] = user.email
+        session['user'] = email
         return redirect('/')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    # pull data from form
-    # gen salt with urandom (at least as long as hash)
-    # hash password + salt
-    # store salt and hashed_pass in db
 
+    form = RegistrationForm()
+
+    if request.method == 'GET':
+        return render_template('register.html', title='Register', form=form)
+
+    if request.method == 'POST':
+
+        if form.validate_on_submit():
+            email = form.email.data
+
+            # final step in validation: unique email/not existing user
+            if User.query.filter_by(email=email).first():
+                flash('A user with that email address already exists!')
+                return render_template('register.html', title='Register', form=form)
+            
+            else:
+                
+                # generate hash to store in db instead of password
+                hashed_pass = security.generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=16)
+
+
+                user = User(form.first_name.data, form.last_name.data, email, hashed_pass)
+                db.session.add(user)
+                db.session.commit()
+
+                flash(f'Account created for {email}!')
+                session['user'] = email
+                return redirect(url_for('home'))
+        
+        else:
+            return render_template('register.html', title='Register', form=form)
+
+      
 
 if __name__ == '__main__':
     app.run()
