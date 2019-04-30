@@ -10,13 +10,19 @@
 
 </head>
     <body>
+      {% if "user" in session %}
+        <p>Current User: {{ session["user"] }}</p>
+      {% endif %}
+      <a href="/logout"><p>Logout</p></a>
+      {% if get_flashed_messages() %}
         <ul>
-        {% for msg in get_flashed_messages() %}
-          <li>{{ msg }}</li>
-        {% endfor %}
+          {% for msg in get_flashed_messages() %}
+            <li class="alert alert-warning">{{ msg }}</li>
+          {% endfor %}
         </ul>
-        <h1>Reading List</h1>
-        {% block content %}
-        {% endblock %}
+      {% endif %}
+      <h1>Reading List</h1>
+      {% block content %}
+      {% endblock %}
     </body>
 </html>
