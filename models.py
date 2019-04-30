@@ -8,13 +8,15 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     author = db.Column(db.String(120), nullable=False)
-    isbn = db.Column(db.Integer)
+    isbn = db.Column(db.String(20), nullable=True)
     reader = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def __init__(self, title, author, reader):
+    def __init__(self, title, author, reader, isbn=None):
         self.title = title
         self.author = author
         self.reader = reader
+        self.isbn = isbn
+
 
     def __repr__(self):
         return f"<Book. Title: {self.title} Author: {self.author}>"

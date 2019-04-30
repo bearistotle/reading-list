@@ -1,8 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
-from wtforms.validators import InputRequired, Length, Email, EqualTo
-
-# TODO: Fix email validation on RegistrationForm
+from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired(),
@@ -30,5 +28,5 @@ class AddBookForm(FlaskForm):
         Length(min=3, max=150)])
     author = StringField("Author (Last, First)", validators=[InputRequired(), 
         Length(min=3, max=120)])
-    isbn = IntegerField("ISBN", validators=[Length(min=10, max=13)])
+    isbn = StringField("ISBN (Optional)", validators=[Optional(), Length(min=10, max=13)])
     submit = SubmitField("Add Book")

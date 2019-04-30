@@ -1,20 +1,30 @@
 {% extends "base.html" %}
-
+<!-- TODO: Create "snooze button to send book to end of list (later version?) -->
 {% block content %}
 <h2>Current Reading List</h2>
-  {% if current_list %}
+  {% if current_list[2] %}
     <ul>
-        <li>{{ current_list[0] }}</li>
-        <li>{{ current_list[1] }}</li>
-        <li>{{ current_list[2] }}</li>
+      {% for i in range(3) %}
+        <li>{{ current_list[i].title }}</li>
+      {% endfor %}
+    </ul>
+  {% elif current_list[1] %}
+    <ul>
+      {% for i in range(2) %}
+        <li>{{ current_list[i].title }}</li>
+      {% endfor %}
+    </ul>
+  {% elif current_list[0] %}
+    <ul>
+        <li>{{ current_list[0].title }}</li>
     </ul>
   {% else %}
   <p>There are no books in your reading list!</p>
   {% endif %}
 
- <!-- 
-    <button type="button">Edit List</button>\
-
+    <a href="/edit-list" class="btn-primary btn-lg" role="button">Edit List</a>
+<!--
+    <a href="/reading-history" class="btn-secondary btn-lg" role="button">Reading History</a>
     <button type="button">Browse Reading Lists</button>
     <button type="button">Settings</button>
 -->
