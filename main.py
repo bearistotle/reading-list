@@ -26,7 +26,7 @@ def home():
 
     email = session["user"]
     user = User.query.filter_by(email=email).first()
-    current_list = Book.query.filter_by(reader=user.id)
+    current_list = Book.query.filter_by(reader=user.id).all()
 
     return render_template("home.html", current_list=current_list)
 
@@ -102,20 +102,17 @@ def logout():
 @app.route("/edit-list", methods=["GET", "POST"])
 def edit_list():
 
-    
-    # current_list = Book.query.filter_by(reader=user.id)
+    # get user
+    email = session["user"]
+    user = User.query.filter_by(email=email).first()
+    current_list = Book.query.filter_by(reader=user.id).all()
     form = AddBookForm()
 
     if request.method == "GET":
-        return render_template("edit-list.html", form=form)
+        return render_template("edit-list.html", form=form,
+            current_list=current_list)
 
-    # TODO: Fix form processing/validation below (possibly no validators
-    #  is the cause of the problem?)
     if form.validate_on_submit():
-
-        # get user
-        email = session["user"]
-        user = User.query.filter_by(email=email).first()
 
         # get form data
         title = form.title.data
@@ -129,7 +126,7 @@ def edit_list():
         db.session.commit()
 
         flash(f"{title} added to reading list!")
-        return redirect(url_for("home"))
+        return redirect(url_for("edit_list"))
     
     for error in form.errors.items():
         flash(f"Error! {error[1][0]}")
