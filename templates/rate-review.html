@@ -1,9 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="" method="POST">
-    {{ form.hidden_tag() }}
+<h2>Nice Work!</h2>
+<h3><small>Now that you've finished <em>{{ book.title }}</em>, rate and review it!</small></h3>
+<form action="/reading-history" method="POST">
+  {{ form.csrf_token() }}
+  <fieldset class="form-group">
+    <div class="form-group">
+      {{ form.rating.label(class="form-control-label") }}
+      {{ form.rating(class="form-control form-control-sm")}}
+    </div>
+    <div class="form-group">
+      {{ form.review.label(class="form-control-label") }}
+      {{ form.review(class="form-control form-control-sm")}}
+    </div>
+    <div class="form-group">
+      {{ form.book_id(value=book.id) }}
+    </div>
+    <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
 </form>
-
 
 {% endblock %}

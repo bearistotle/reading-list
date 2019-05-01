@@ -8,7 +8,7 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     author = db.Column(db.String(120), nullable=False)
-    reader = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user = db.Column(db.Integer, db.ForeignKey("user.id"))
     read = db.Column(db.Boolean(), nullable=False)
     rating = db.Column(db.String(5), nullable=True)
     review = db.Column(db.String(5000), nullable=True)
@@ -16,10 +16,10 @@ class Book(db.Model):
     
 
     # do I need to initialize book instances with rating, review, and isbn?
-    def __init__(self, title, author, reader, read=False, rating=None, review=None, isbn=None):
+    def __init__(self, title, author, user, read=False, rating=None, review=None, isbn=None):
         self.title = title
         self.author = author
-        self.reader = reader
+        self.user = user
         self.read = read
         self.rating = rating
         self.review = review
@@ -34,7 +34,7 @@ class User(db.Model):
     last_name = db.Column(db.String(60))
     email = db.Column(db.String(60), unique=True, nullable=False)
     pw_hash = db.Column(db.String(120), nullable=False)
-    books = db.relationship("Book", backref="book.reader")
+    books = db.relationship("Book", backref="book.user")
 
 
     def __init__(self, first_name, last_name, email, password):

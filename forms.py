@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, TextAreaField, HiddenField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional
 
 class LoginForm(FlaskForm):
@@ -30,3 +30,9 @@ class AddBookForm(FlaskForm):
         Length(min=3, max=120)])
     isbn = StringField("ISBN (Optional)", validators=[Optional(), Length(min=10, max=13)])
     submit = SubmitField("Add Book")
+
+class RateReviewForm(FlaskForm):
+    rating = SelectField("Rating", choices=[(1, "*"), (2, "**"), (3, "***"), (4, "****"), (5, "*****")])
+    review = TextAreaField("Review", validators=[Optional(), Length(min=0, max=5000)])
+    book_id = HiddenField() # better validators? # what to do on err?
+    submit = SubmitField("Mark as Read")
