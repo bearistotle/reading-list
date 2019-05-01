@@ -132,5 +132,34 @@ def edit_list():
         flash(f"Error! {error[1][0]}")
 
     return render_template("edit-list.html", form=form)
+
+@app.route("/remove-book", methods=["GET"])
+def remove_book():
+    if request.args:
+        book_id = request.args.get("id")
+        book = Book.query.get(book_id)
+
+        db.session.delete(book)
+        db.session.commit()
+
+    return redirect(url_for("edit_list"))
+
+@app.route("/reading-history", methods=["GET", "POST"])
+def reading_history():
+    if request.args:
+        book_id = request.args.get("id")
+        book = Book.query.get(book_id)
+
+        form = RateReviewForm()
+
+        # send user to rating and review form
+        # once user fills out form, have it post here
+        # process form data
+        # user should fall through to simply rendering reading history template
+        # (it should be a GET with no args)
+
+        # TODO: drop and create tables to update Book model; finish rate-review template
+    
+
 if __name__ == "__main__":
     app.run()

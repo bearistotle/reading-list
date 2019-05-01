@@ -8,15 +8,22 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     author = db.Column(db.String(120), nullable=False)
-    isbn = db.Column(db.String(20), nullable=True)
     reader = db.Column(db.Integer, db.ForeignKey("user.id"))
+    read = db.Column(db.Boolean(), nullable=False)
+    rating = db.Column(db.String(5), nullable=True)
+    review = db.Column(db.String(5000), nullable=True)
+    isbn = db.Column(db.String(20), nullable=True)
+    
 
-    def __init__(self, title, author, reader, isbn=None):
+    # do I need to initialize book instances with rating, review, and isbn?
+    def __init__(self, title, author, reader, read=False, rating=None, review=None, isbn=None):
         self.title = title
         self.author = author
         self.reader = reader
+        self.read = read
+        self.rating = rating
+        self.review = review
         self.isbn = isbn
-
 
     def __repr__(self):
         return f"<Book. Title: {self.title} Author: {self.author}>"
