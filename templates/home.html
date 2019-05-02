@@ -1,40 +1,55 @@
 {% extends "base.html" %}
 <!-- TODO: Create "snooze button to send book to end of list (later version?) -->
 {% block content %}
-<div class="row">
-  <div class="col-sm-2">
-  </div>
-  <div class="col-sm-8">
-    <h2>Current Reading List</h2>
-      {% if current_list[2] %}
-        <ul>
-          {% for i in range(3) %}
-            <li>{{ current_list[i].title }}</li>
-          {% endfor %}
-        </ul>
-      {% elif current_list[1] %}
-        <ul>
-          {% for i in range(2) %}
-            <li>{{ current_list[i].title }}</li>
-          {% endfor %}
-        </ul>
-      {% elif current_list[0] %}
-        <ul>
-            <li>{{ current_list[0].title }}</li>
-        </ul>
-      {% else %}
-      <p>There are no books in your reading list!</p>
-      {% endif %}
+<h2>Current Reading List</h2>
 
-        <a href="/edit-list" class="btn-primary btn-lg" role="button">Edit List</a>
-    
-        <a href="/reading-history" class="btn-secondary btn-lg" role="button">Reading History</a>
-    <!--
-        <button type="button">Browse Reading Lists</button>
-        <button type="button">Settings</button>
-    -->
-  </div>
-  <div class="col-sm-2">
-  </div>
-</div>
+  {% if current_list | length > 2 %}
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <td>Title</td>
+          <td>Author</td>
+          <td>Category</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in range(3) %}
+        <tr>
+          <td>{{ current_list[i].title }}</td>
+          <td>{{ current_list[i].author }}</td>
+          <!--<td>{{ current_list[i].category }}</td>-->
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% elif current_list | length > 0 %}
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <td>Title</td>
+          <td>Author</td>
+          <td>Category</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in current_list %}
+        <tr>
+          <td>{{ book.title }}</td>
+          <td>{{ book.author}}</td>
+          <!--<td>{{ book.category }}</td>-->
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+  <p>There are no books in your reading list!</p>
+  {% endif %}
+
+    <a href="/edit-list" class="btn-primary btn-lg" role="button">Edit List</a>
+
+    <a href="/reading-history" class="btn-secondary btn-lg" role="button">Reading History</a>
+<!--
+    <button type="button">Browse Reading Lists</button>
+    <button type="button">Settings</button>
+-->
 {% endblock %}

@@ -28,7 +28,7 @@ class AddBookForm(FlaskForm):
         Length(min=3, max=150)])
     author = StringField("Author (Last, First)", validators=[InputRequired(), 
         Length(min=3, max=120)])
-    isbn = StringField("ISBN (Optional)", validators=[Optional(), Length(min=10, max=13)])
+    isbn = StringField("ISBN (Optional)", validators=[Optional(), Length(min=10, max=14)])
     submit = SubmitField("Add Book")
 
 class RateReviewForm(FlaskForm):

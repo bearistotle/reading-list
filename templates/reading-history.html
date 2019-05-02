@@ -1,41 +1,35 @@
 {% extends "base.html" %}
 
+<!-- TODO: Make review box in table display a snippet and then an ellipsis 
+  that links to the entire review on a separate page-->
+
 {% block content %}
-<div class="row">
-    <div class="col-sm-2">
-    </div>
-    <div class="col-sm-8">
-      <h2>Reading History</h2>
-      {% if history[0] %}
-      <table class="table table-hover table-striped">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Rating</th>
-                <th>Review</th>
-                <!-- TODO: Add Date field (make nec. adjustments to book field 
-                  and handlers in main.py -->
-            </tr>
-        </thead>
-        <tbody>
-        {% for book in history %}
-          <tr>
-              <td>{{ book.title }}</td>
-              <td>{{ book.author }}</td>
-              <td>{{ book.rating }}</td>
-              <td>{{ book.review }}</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <h3>You haven't read any books yet!</h3>
-      {% endif %}
-    </div>
-    <div class="col-sm-2">
-    </div>
-    
-</div>
+<h2>Reading History</h2>
+{% if history[0] %}
+<table class="table table-hover table-striped">
+  <thead>
+      <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Rating</th>
+          <th>Review</th>
+          <!-- TODO: Add Date field (make nec. adjustments to book field 
+            and handlers in main.py -->
+      </tr>
+  </thead>
+  <tbody>
+  {% for book in history %}
+    <tr>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.rating }}</td>
+        <td>{{ book.review }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<h3>You haven't read any books yet!</h3>
+{% endif %}
 
 {% endblock %}

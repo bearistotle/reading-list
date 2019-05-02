@@ -7,29 +7,26 @@
   </div>
   <div class="col-sm-8">
     <h2>{{ title }}</h2>
-      <form method="POST" action="">
-          {{ form.hidden_tag() }}
-          <fieldset class="form-group">
-              <div class="form-group">
-                {{ form.email.label(class="form-control-label") }}
-                {{ form.email(class="form-control form-control-sm") }}
-              </div>
-              <div class="form-group">
-                {{ form.password.label(class="form-control-label") }}
-                {{ form.password(class="form-control form-control-sm") }}
-              </div>
-              <div class="form-group">
-              {{ form.remember.label(class="form-control-label") }}
-              {{ form.remember(class="form-control form-control-sm") }}
-              </div>
-              <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
-              </div>
-          </fieldset>
-      </form>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+              {{ form.email.label(class="form-control-label") }}
+              {{ form.email(class="form-control form-control-sm") }}
+            </div>
+            <div class="form-group">
+              {{ form.password.label(class="form-control-label") }}
+              {{ form.password(class="form-control form-control-sm") }}
+            </div>
+            <div class="form-group">
+              {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </fieldset>
+    </form>
     <p>Don't have an account? <a href="/register">Register Here</a></p>
   </div>
   <div class="col-sm-2">
   </div>
 </div>
+
 {% endblock %}
