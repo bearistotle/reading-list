@@ -29,7 +29,34 @@ def home():
 
     email = session["user"]
     user = User.query.filter_by(email=email).first()
-    current_list = Book.query.filter_by(user=user.id, read=False).all()
+    master_list = Book.query.filter_by(user=user.id, read=False).all()
+    current_list = []
+
+    for i in range(3):
+
+        if master_list[i].category == 1:
+            category = "5 Mins to Kill"
+            style = "table-success"
+
+        elif master_list[i].category == 2: 
+            category = "Relax/Escape"
+            style = "table-info"
+
+        elif master_list[i].category == 3:
+            category = "Focused Learning"
+            style = "table-warning"
+
+        else:
+            category = "None"
+            style = "table-light"
+
+        current_list.append(
+                           {"title": master_list[i].title,
+                            "author": master_list[i].author,
+                            "category": category, 
+                            "style": style}
+                            )
+
 
     return render_template("home.html", current_list=current_list)
 
@@ -115,6 +142,11 @@ def logout():
 @app.route("/edit-list", methods=["GET", "POST"])
 def edit_list():
 
+# TODO: Refactor to move processing from templates to main
+# TODO: Make adding a book a modal 
+# TODO: Give the reading list table its own screen; allow change of 
+# category via dropdown selection in table row
+
     # get user
     email = session["user"]
     user = User.query.filter_by(email=email).first()
@@ -130,13 +162,15 @@ def edit_list():
         # get form data
         title = form.title.data
         author = form.author.data
+        category = form.category.data
         user = user.id
         read = False
         rating = None
         review = None
         isbn = form.isbn.data
 
-        book = Book(title, author, user, read, rating, review, isbn)
+        book = Book(title, author, category, user, read, rating, review, isbn)
+        print(type(book.category))
 
         db.session.add(book)
         db.session.commit()
@@ -163,6 +197,8 @@ def remove_book():
 
         db.session.delete(book)
         db.session.commit()
+
+        flash(f"{book.title} removed from reading list!", "info")
 
     return redirect(url_for("edit_list"))
 

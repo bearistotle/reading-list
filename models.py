@@ -8,6 +8,7 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     author = db.Column(db.String(120), nullable=False)
+    category = db.Column(db.Integer, db.ForeignKey("category.id"))
     user = db.Column(db.Integer, db.ForeignKey("user.id"))
     read = db.Column(db.Boolean(), nullable=False)
     rating = db.Column(db.String(5), nullable=True)
@@ -16,9 +17,10 @@ class Book(db.Model):
     
 
     # do I need to initialize book instances with rating, review, and isbn?
-    def __init__(self, title, author, user, read=False, rating=None, review=None, isbn=None):
+    def __init__(self, title, author,category, user, read=False, rating=None, review=None, isbn=None):
         self.title = title
         self.author = author
+        self.category = category
         self.user = user
         self.read = read
         self.rating = rating
@@ -26,7 +28,7 @@ class Book(db.Model):
         self.isbn = isbn
 
     def __repr__(self):
-        return f"<Book. Title: {self.title} Author: {self.author}>"
+        return f"<Book. Title: {self.title} Author: {self.author} Category: {self.category}>"
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,5 +47,16 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User. ID: {self.id} Email: {self.email}>"
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    books = db.relationship("Book", backref="book.category")
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f"<Category: {self.name}>"
 
 

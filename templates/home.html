@@ -3,26 +3,7 @@
 {% block content %}
 <h2>Current Reading List</h2>
 
-  {% if current_list | length > 2 %}
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <td>Title</td>
-          <td>Author</td>
-          <td>Category</td>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in range(3) %}
-        <tr>
-          <td>{{ current_list[i].title }}</td>
-          <td>{{ current_list[i].author }}</td>
-          <!--<td>{{ current_list[i].category }}</td>-->
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% elif current_list | length > 0 %}
+  {% if current_list %}
     <table class="table table-hover">
       <thead>
         <tr>
@@ -33,12 +14,12 @@
       </thead>
       <tbody>
         {% for book in current_list %}
-        <tr>
-          <td>{{ book.title }}</td>
-          <td>{{ book.author}}</td>
-          <!--<td>{{ book.category }}</td>-->
-        </tr>
-      {% endfor %}
+          <tr class={{ book["style"] }}>
+            <td>{{ book["title"] }}</td>
+            <td>{{ book["author"] }}</td>
+            <td>{{ book["category"] }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
   {% else %}
