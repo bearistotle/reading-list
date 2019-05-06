@@ -3,7 +3,7 @@
 {% block content %}
 <h2>Current Reading List</h2>
 
-  {% if current_list %}
+  {% if list %}
     <table class="table table-hover">
       <thead>
         <tr>
@@ -13,11 +13,11 @@
         </tr>
       </thead>
       <tbody>
-        {% for book in current_list %}
-          <tr class={{ book["style"] }}>
-            <td>{{ book["title"] }}</td>
-            <td>{{ book["author"] }}</td>
-            <td>{{ book["category"] }}</td>
+        {% for book in list %}
+          <tr class={{ book[2] }}>
+            <td>{{ book[0].title }}</td>
+            <td>{{ book[0].author }}</td>
+            <td>{{ book[1].name }}</td>
           </tr>
         {% endfor %}
       </tbody>

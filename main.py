@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import InputRequired, Length, Email, EqualTo
 from app import db, app
-from models import User, Book
+from models import User, Book, Category
 from forms import LoginForm, RegistrationForm, AddBookForm, RateReviewForm
 from hashutils import check_pw_hash
 
@@ -13,7 +13,7 @@ from hashutils import check_pw_hash
 # options for weights, categories, priorities, ratios?), subscribable
 # reading lists, . . .
 
-# TODO: create route/handler and template for reading-history
+# TODO: change text to title capitalization on display (store lower?)
 
 
 @app.before_request
@@ -29,36 +29,62 @@ def home():
 
     email = session["user"]
     user = User.query.filter_by(email=email).first()
-    master_list = Book.query.filter_by(user=user.id, read=False).all()
-    current_list = []
+    book_list = Book.query.filter_by(user=user.id, read=False).all()
 
-    for i in range(3):
+    if len(book_list) < 3:
 
-        if master_list[i].category == 1:
-            category = "5 Mins to Kill"
-            style = "table-success"
+        
 
-        elif master_list[i].category == 2: 
-            category = "Relax/Escape"
-            style = "table-info"
+        category_list = []
+        [category_list.append(Category.query.filter_by(id=book.category).first()) for book in book_list]
+    
+        style_list = []
+            
+        # would this be better as a list comp? Prob not bc of multiple conditions?
+        for category in category_list:
+            if category.name == "5 Mins to Kill":
+                style = "table-success"
+            elif category.name == "Relax/Escape":
+                style = "table-info"
+            elif category.name == "Focused Learning":
+                style = "table-warning"
+            else:
+                style = "table-secondary"
+            
+            style_list.append(style)
 
-        elif master_list[i].category == 3:
-            category = "Focused Learning"
-            style = "table-warning"
+        # need to wrap zip in list in Py 3x bc zip rtns iterable not list
+        book_cat_style_list = list(zip(book_list, category_list, style_list))
 
-        else:
-            category = "None"
-            style = "table-light"
+        return render_template("home.html", list=book_cat_style_list)
 
-        current_list.append(
-                           {"title": master_list[i].title,
-                            "author": master_list[i].author,
-                            "category": category, 
-                            "style": style}
-                            )
+    else:
 
+        # append current list with first bk from ea. category
+        user_id = User.query.filter_by(email=session["user"]).first().id
 
-    return render_template("home.html", current_list=current_list)
+        book_list = []
+        [book_list.append(Book.query.filter_by(category=i, user=user_id).first()) for i in range(1, 4)]
+
+        category_list = []
+        [category_list.append(Category.query.filter_by(id=book.category).first()) for book in book_list]
+
+        style_list = []
+        for category in category_list:
+            if category.name == "5 Mins to Kill":
+                style = "table-success"
+            elif category.name == "Relax/Escape":
+                style = "table-info"
+            elif category.name == "Focused Learning":
+                style = "table-warning"
+            else:
+                style = "table-secondary"
+            
+            style_list.append(style)
+
+        current_list = list(zip(book_list, category_list, style_list))
+
+        return render_template("home.html", list=current_list)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -73,7 +99,8 @@ def login():
         email = form.email.data.lower()
         password = form.password.data
 
-        if not User.query.filter_by(email=email):
+        if not User.query.filter_by(email=email).first():
+
             flash("Invalid username or password.", "error")
             return render_template("login.html", title="Log In", form=form)
 
@@ -143,19 +170,24 @@ def logout():
 def edit_list():
 
 # TODO: Refactor to move processing from templates to main
-# TODO: Make adding a book a modal 
-# TODO: Give the reading list table its own screen; allow change of 
-# category via dropdown selection in table row
+
+# TODO: allow change of category via dropdown selection in table row
 
     # get user
     email = session["user"]
     user = User.query.filter_by(email=email).first()
-    current_list = Book.query.filter_by(user=user.id, read=False).all()
+    book_list = Book.query.filter_by(user=user.id, read=False).all()
+    category_list = []
+    
+    [category_list.append(Category.query.filter_by(id=book.category).first()) for book in book_list]
+
+    book_category_list = list(zip(book_list, category_list))
+
     form = AddBookForm()
 
     if request.method == "GET":
         return render_template("edit-list.html", form=form,
-                               current_list=current_list)
+                               list=book_category_list)
 
     if form.validate_on_submit():
 
@@ -170,7 +202,6 @@ def edit_list():
         isbn = form.isbn.data
 
         book = Book(title, author, category, user, read, rating, review, isbn)
-        print(type(book.category))
 
         db.session.add(book)
         db.session.commit()
@@ -184,7 +215,7 @@ def edit_list():
         flash(f"{error[1][0]}!", "error")
 
     return render_template("edit-list.html", form=form,
-                           current_list=current_list)
+                           list=book_with_category)
 
 
 @app.route("/remove-book", methods=["GET"])

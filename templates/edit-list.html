@@ -1,71 +1,82 @@
 {% extends "base.html" %}
-<!-- TODO: Create an element that will display full list in scrollable column,
-   with "X" btn to send items to "read" list (update models with Boolean column
-    for this) -->
 {% block content %}
-<div class="row">
-  <div class="col-sm-5">
-    <h2>Add Book</h2>
-    <form action="" method="POST">
-      {{ form.hidden_tag() }}
-      <div class="form-group">
-        {{ form.title.label(class="form-control-label") }}
-        {{ form.title(class="form-control form-control-lg") }}
-      </div>
-      <div class="form-group">
-        {{ form.author.label(class="form-control-label") }}
-        {{ form.author(class="form-control form-control-lg") }}
-      </div>
-      <div class="form-group">
-        {{ form.category.label(class="form-control-label") }}
-        {{ form.category(class="form-control form-control-lg") }}
-      </div>
-      <div class="form-group">
-        {{ form.isbn.label(class="form-control-label") }}
-        {{ form.isbn(class="form-control form-control-lg") }}
-      </div>
-      <div class="form-group">
-        {{ form.submit(class="btn btn-outline-info") }}
-      </div>
-    </form>
-  </div>
-  <div class="col-sm-1">
-  </div>
-  <div class="col-sm-6">
-    <h2>Remove Books</h2>
-    <table class="table table-condensed table-hover">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Action</th>
+<div class="container">
+  <h2>Edit List</h2>
+  <table class="table table-condensed table-hover">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- Color code row for ea book based on category -->
+    {% for book in list %}
+      {% if book[1].name is eq("5 Mins to Kill") %}
+        <tr class="table-success">
+      {% elif book[1].name is eq("Relax/Escape") %}
+        <tr class="table-info">
+      {% elif book[1].name is eq("Focused Learning") %}
+      <tr>
+        <tr class="table-warning">
+      {% else %}
+      {% endif %}
+          <td>{{ book[0].title }}</td>
+          <td>{{ book[0].author }}</td>
+          <td>{{ book[1].name }}</td>
+          <!--TODO: Add drop down to change category here-->
+          <td>
+            <div class="btn-group">
+              <a href="/remove-book?id={{ book[0].id }}" class="btn btn-secondary btn-sm">Remove</a>
+              <a href="/reading-history?id={{ book[0].id }}" class="btn btn-primary btn-sm">Finished</a>
+            </div>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-      <!-- Color code row for ea book based on category -->
-      {% for book in current_list %}
-        {% if book.category is eq(1) %}
-          <tr class="table-success">
-        {% elif book.category is eq(2) %}
-          <tr class="table-info">
-        {% elif book.category is eq(3) %}
-          <tr class="table-warning">
-        {% else %}
-          <tr>
-        {% endif %}
-            <td>{{ book.title }}</td>
-            <td>{{ book.author }}</td>
-            <td>
-              <div class="btn-group">
-                  <a href="/reading-history?id={{ book.id }}" class="btn btn-primary btn-sm">Finished</a>
-                  <a href="/remove-book?id={{ book.id }}" class="btn btn-secondary btn-sm">Remove</a>
-              </div>
-            </td>
-          </tr>
-      {% endfor %}
-      </tbody>
-    <!-- Delete Button -->
-    </table>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="container">
+  <button type="button" class="btn btn-primary" data-toggle="modal"
+    data-target="#addbookModal">Add Book</button>
+  <div class="modal fade" id="addbookModal" tab-index="-1" role="dialog"
+    arialabelledby="addbookModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addbookModalLable">Add Book</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-lable="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="add-book" action="" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+              {{ form.title.label(class="form-control-label") }}
+              {{ form.title(class="form-control form-control-lg") }}
+            </div>
+            <div class="form-group">
+              {{ form.author.label(class="form-control-label") }}
+              {{ form.author(class="form-control form-control-lg") }}
+            </div>
+            <div class="form-group">
+              {{ form.category.label(class="form-control-label") }}
+              {{ form.category(class="form-control form-control-lg") }}
+            </div>
+            <div class="form-group">
+              {{ form.isbn.label(class="form-control-label") }}
+              {{ form.isbn(class="form-control form-control-lg") }}
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" form="add-book">Submit</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
