@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
+<div class="container absolute">
   <h2>Edit List</h2>
-  <table class="table table-condensed table-hover">
+  <table class="table table-condensed table-hover table-scroll">
     <thead>
       <tr>
         <th>Title</th>
@@ -22,58 +22,68 @@
         <tr class="table-warning">
       {% else %}
       {% endif %}
-          <td>{{ book[0].title }}</td>
-          <td>{{ book[0].author }}</td>
-          <td>{{ book[1].name }}</td>
-          <!--TODO: Add drop down to change category here-->
-          <td>
-            <div class="btn-group">
-              <a href="/remove-book?id={{ book[0].id }}" class="btn btn-secondary btn-sm">Remove</a>
-              <a href="/reading-history?id={{ book[0].id }}" class="btn btn-primary btn-sm">Finished</a>
+        <td>{{ book[0].title }}</td>
+        <td>{{ book[0].author }}</td>
+        <td>{{ book[1].name }}</td>
+        <td>
+          <div class="dropdown">
+              <button class="btn btn-light dropdown-toggle" type="button"
+              id="btn-dropdown" data-toggle="dropdown">{{ book[1].name }}</button>
+              <div class="dropdown-menu" aria-labelledby="btn-dropdown">
+                <a class="dropdown-item" href="/edit-list?book_id={{ book[0].id }}&category_id=1">5 Mins to Kill</a>
+                <a class="dropdown-item" href="/edit-list?book_id={{ book[0].id }}&category_id=2">Relax/Escape</a>
+                <a class="dropdown-item" href="/edit-list?book_id={{ book[0].id }}&category_id=3">Focused Learning</a>
+              </div>
             </div>
-          </td>
-        </tr>
+        </td>
+        <td>
+          <div class="btn-group">
+            <a href="/reading-history?id={{ book[0].id }}" class="btn btn-primary btn-sm">Finished</a>
+            <a href="/remove-book?id={{ book[0].id }}" class="btn btn-secondary btn-sm">Remove</a>
+          </div>
+        </td>
+      </tr>
     {% endfor %}
     </tbody>
   </table>
-</div>
-<div class="container">
-  <button type="button" class="btn btn-primary" data-toggle="modal"
-    data-target="#addbookModal">Add Book</button>
-  <div class="modal fade" id="addbookModal" tab-index="-1" role="dialog"
-    arialabelledby="addbookModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addbookModalLable">Add Book</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-lable="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="add-book" action="" method="POST">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-              {{ form.title.label(class="form-control-label") }}
-              {{ form.title(class="form-control form-control-lg") }}
-            </div>
-            <div class="form-group">
-              {{ form.author.label(class="form-control-label") }}
-              {{ form.author(class="form-control form-control-lg") }}
-            </div>
-            <div class="form-group">
-              {{ form.category.label(class="form-control-label") }}
-              {{ form.category(class="form-control form-control-lg") }}
-            </div>
-            <div class="form-group">
-              {{ form.isbn.label(class="form-control-label") }}
-              {{ form.isbn(class="form-control form-control-lg") }}
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary" form="add-book">Submit</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+  <div class="relative">
+    <button type="button" class="btn btn-primary add-book-btn" data-toggle="modal"
+      data-target="#addbookModal">Add Book</button>
+    <div class="modal fade" id="addbookModal" tab-index="-1" role="dialog"
+      arialabelledby="addbookModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addbookModalLable">Add Book</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-lable="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="add-book" action="" method="POST">
+              {{ form.hidden_tag() }}
+              <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                {{ form.title(class="form-control form-control-lg") }}
+              </div>
+              <div class="form-group">
+                {{ form.author.label(class="form-control-label") }}
+                {{ form.author(class="form-control form-control-lg") }}
+              </div>
+              <div class="form-group">
+                {{ form.category.label(class="form-control-label") }}
+                {{ form.category(class="form-control form-control-lg") }}
+              </div>
+              <div class="form-group">
+                {{ form.isbn.label(class="form-control-label") }}
+                {{ form.isbn(class="form-control form-control-lg") }}
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" form="add-book">Submit</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
         </div>
       </div>
     </div>

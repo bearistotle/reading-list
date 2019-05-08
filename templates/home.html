@@ -18,6 +18,9 @@
             <td>{{ book[0].title }}</td>
             <td>{{ book[0].author }}</td>
             <td>{{ book[1].name }}</td>
+            <td>
+              <a href="/snooze?id={{ book[0].id }}"><button type="button" class="btn btn-light snooze">Snooze</button></a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

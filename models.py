@@ -10,6 +10,7 @@ class Book(db.Model):
     author = db.Column(db.String(120), nullable=False)
     category = db.Column(db.Integer, db.ForeignKey("category.id"))
     user = db.Column(db.Integer, db.ForeignKey("user.id"))
+    date_added = db.Column(db.DateTime)
     read = db.Column(db.Boolean(), nullable=False)
     rating = db.Column(db.String(5), nullable=True)
     review = db.Column(db.String(5000), nullable=True)
@@ -17,11 +18,12 @@ class Book(db.Model):
     
 
     # do I need to initialize book instances with rating, review, and isbn?
-    def __init__(self, title, author,category, user, read=False, rating=None, review=None, isbn=None):
+    def __init__(self, title, author, category, user, date_added, read=False, rating=None, review=None, isbn=None):
         self.title = title
         self.author = author
         self.category = category
         self.user = user
+        self.date_added = date_added
         self.read = read
         self.rating = rating
         self.review = review

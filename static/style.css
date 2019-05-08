@@ -1,0 +1,14 @@
+.table-scroll tbody{
+    position: absolute;
+    overflow-y: scroll;
+    height: 200%;
+}
+
+.absolute{
+    position: absolute;
+}
+
+.relative{
+    position: relative;
+    top: 300px;
+}
