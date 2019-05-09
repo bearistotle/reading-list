@@ -3,7 +3,7 @@
 {% block content %}
 <h2>Current Reading List</h2>
 
-  {% if list %}
+  {% if current %}
     <table class="table table-hover">
       <thead>
         <tr>
@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for book in list %}
+        {% for book in current %}
           <tr class={{ book[2] }}>
             <td>{{ book[0].title }}</td>
             <td>{{ book[0].author }}</td>
@@ -32,6 +32,33 @@
     <a href="/edit-list" class="btn-primary btn-lg" role="button">Edit List</a>
 
     <a href="/reading-history" class="btn-secondary btn-lg" role="button">Reading History</a>
+  <br><br>
+  <h2>Upcoming Books</h2>
+  {% if upcoming %}
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <td>Title</td>
+          <td>Author</td>
+          <td>Category</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in upcoming %}
+          <tr class="{{ book[2] }}">
+            <td>{{ book[0].title }}</td>
+            <td>{{ book[0].author }}</td>
+            <td>{{ book[0].name }}</td>
+            <td>
+              <a href="/snooze?id={{ book[0].id }}"><button type="button" class="btn btn-light snooze">Snooze</button></a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      {% else %}
+      <p>There are no upcoming books. Add more books to your reading list!</p>
+      {% endif %}
+    </table>
 <!--
     <button type="button">Browse Reading Lists</button>
     <button type="button">Settings</button>

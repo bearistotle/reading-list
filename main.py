@@ -35,9 +35,6 @@ def home():
     book_list = Book.query.filter_by(user=user.id, read=False).all()
     book_list = sorted(book_list, key=lambda x: x.date_added)
 
-    # print statement for debugging
-    for book in book_list:
-        print(book, book.date_added)
 
     # if 3 or fewer books, display all books
     if len(book_list) <= 3:
@@ -64,7 +61,7 @@ def home():
         # (what is the difference? iterables don't support indexing?)
         current_list = list(zip(book_list, category_list, style_list))
 
-        return render_template("home.html", list=current_list)
+        return render_template("home.html", current=current_list)
 
     # if more than 3 books, display first book from ea category
     else:
@@ -116,7 +113,74 @@ def home():
 
         current_list = list(zip(current_books, category_list, style_list))
 
-        return render_template("home.html", list=current_list)
+        # if booklist < 6, add all over 3 to upcoming
+        upcoming_books = []
+        if len(book_list) <= 6:
+            for book in book_list:
+                if book not in current_books:
+                    upcoming_books.append(book)
+            
+            category_list = []
+            [category_list.append(Category.query.filter_by(id=book.category).first()) for book in upcoming_books]
+
+            style_list = []
+            for category in category_list:
+                if category.name == "5 Mins to Kill":
+                    style = "table-success"
+                elif category.name == "Relax/Escape":
+                    style = "table-info"
+                elif category.name == "Focused Learning":
+                    style = "table-warning"
+                else:
+                    style = "table-secondary"
+
+                style_list.append(style)
+            
+            upcoming_list = list(zip(upcoming_books, category_list, style_list))
+
+        # else add 4, 5, 6 to upcoming
+        else:
+
+            i = 1
+            while len(upcoming_books) < 3:
+                for book in book_list:
+                    if book not in current_books:
+
+                        if book.category == i:
+
+                            earlier_bk_in_cat = False
+
+                            for tome in upcoming_books:
+
+                                if tome.category == i:
+                                    earlier_bk_in_cat = True
+                                    break
+
+                            if earlier_bk_in_cat == False:
+                                upcoming_books.append(book)
+                                break
+
+                i += 1
+
+            category_list = []
+            [category_list.append(Category.query.filter_by(id=book.category).first()) for book in upcoming_books]
+
+            style_list = []
+            for category in category_list:
+                if category.name == "5 Mins to Kill":
+                    style = "table-success"
+                elif category.name == "Relax/Escape":
+                    style = "table-info"
+                elif category.name == "Focused Learning":
+                    style = "table-warning"
+                else:
+                    style = "table-secondary"
+
+                style_list.append(style)
+            
+            upcoming_list = list(zip(upcoming_books, category_list, style_list))
+
+        return render_template("home.html", current=current_list, upcoming=upcoming_list)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -301,6 +365,7 @@ def reading_history():
         book.rating = rating
         book.review = review
         book.read = True
+        book.date_read = datetime.utcnow()
 
         db.session.commit()
         flash(f"{book.title} added to your reading history.", "info")
@@ -309,13 +374,17 @@ def reading_history():
     # form data has been validated and db has been updated
     user_email = session["user"]
     user = User.query.filter_by(email=user_email).first()
-    history = Book.query.filter_by(user=user.id, read=True)
+    read_books = Book.query.filter_by(user=user.id, read=True).all()
+
+    review_snippets = []
+    for book in read_books:
+        snippet = book.review[:200]
+        review_snippets.append(snippet)
+    
+    history = list(zip(read_books, review_snippets))
 
     return render_template("reading-history.html", history=history)
 
-# TODO: Fix snooze function (or processing in home);
-# category 2 only updates after books in other categories are snoozed;
-# other categories seem to work fine.
 
 @app.route("/snooze", methods=["GET"])
 def snooze():
@@ -332,6 +401,17 @@ def snooze():
 
 
     return redirect(url_for("home"))
+
+@app.route("/full-review", methods=["GET"])
+def full_review():
+
+    if request.args:
+
+        book = Book.query.get(request.args.get("id"))
+
+        return render_template("full-review.html", book=book)
+        
+    return redirect(url_for("reading_history"))
 
 if __name__ == "__main__":
     app.run()

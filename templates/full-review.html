@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+<!--TODO: Make card-body scrollable-->
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>{{ book.title }} - <small>{{ book.author }}</small></h2>
+  </div>
+  <div class="card-body">
+    {{ book.review }}
+  </div>
+  <div class="card-footer">Rating: {{ book.rating }}</div>
+</div>
+
+{% endblock %}

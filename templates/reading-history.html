@@ -8,22 +8,22 @@
 {% if history[0] %}
 <table class="table table-hover table-striped">
   <thead>
-      <tr>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Rating</th>
-          <th>Review</th>
-          <!-- TODO: Add Date field (make nec. adjustments to book field 
-            and handlers in main.py -->
-      </tr>
+    <tr>
+      <th>Title</th>
+      <th>Author</th>
+      <th>Rating</th>
+      <th>Review</th>
+      <th>Date Read</th>
+    </tr>
   </thead>
   <tbody>
   {% for book in history %}
     <tr>
-        <td>{{ book.title }}</td>
-        <td>{{ book.author }}</td>
-        <td>{{ book.rating }}</td>
-        <td>{{ book.review }}</td>
+      <td>{{ book[0].title }}</td>
+      <td>{{ book[0].author }}</td>
+      <td>{{ book[0].rating }}</td>
+      <td>{{ book[1] }}<a href="/full-review?id={{ book[0].id }}">. . .</a></td>
+      <td>{{ book[0].date_read }}</td>
     </tr>
   {% endfor %}
   </tbody>
