@@ -4,11 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import InputRequired, Length, Email, EqualTo
-from app import db, app
+from app import db, app, service
 from models import User, Book, Category
 from forms import LoginForm, RegistrationForm, AddBookForm, RateReviewForm
+from forms import SearchForm, NavBarSearchForm
 from hashutils import check_pw_hash
 from datetime import datetime
+
 
 # routes: index, reading now, coming up, full list, settings (sub settings
 # options for weights, categories, priorities, ratios?), subscribable
@@ -27,6 +29,11 @@ def require_login():
 @app.route("/", methods=["GET"])
 @app.route("/home", methods=["GET"])
 def home():
+    # form for search in navbar (since this is the same for all routes,
+    # except login and register, this should probably be set in the app.py
+    # file with other configuration stuff)
+    search_form = NavBarSearchForm()
+
     # determine the user
     email = session["user"]
     user = User.query.filter_by(email=email).first()
@@ -61,7 +68,7 @@ def home():
         # (what is the difference? iterables don't support indexing?)
         current_list = list(zip(book_list, category_list, style_list))
 
-        return render_template("home.html", current=current_list)
+        return render_template("home.html", current=current_list, search_form=search_form)
 
     # if more than 3 books, display first book from ea category
     else:
@@ -180,7 +187,7 @@ def home():
             
             upcoming_list = list(zip(upcoming_books, category_list, style_list))
 
-        return render_template("home.html", current=current_list, upcoming=upcoming_list)
+        return render_template("home.html", current=current_list, upcoming=upcoming_list, search_form=search_form)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -265,6 +272,11 @@ def logout():
 @app.route("/edit-list", methods=["GET", "POST"])
 def edit_list():
 
+    # form for search in navbar (since this is the same for all routes,
+    # except login and register, this should probably be set in the app.py
+    # file with other configuration stuff)
+    search_form = NavBarSearchForm()
+
 # TODO: Refactor to move processing from templates to main
 
 # TODO: allow change of category via dropdown selection in table row
@@ -292,8 +304,7 @@ def edit_list():
 
             return redirect(url_for("edit_list"))
 
-        return render_template("edit-list.html", form=form,
-                               list=book_category_list)
+        return render_template("edit-list.html", form=form, search_form=search_form, list=book_category_list)
 
     if form.validate_on_submit():
 
@@ -321,12 +332,16 @@ def edit_list():
 
         flash(f"{error[1][0]}!", "error")
 
-    return render_template("edit-list.html", form=form,
-                           list=book_with_category)
+    return render_template("edit-list.html", form=form, search_form=search_form,
+                           list=book_category_list)
 
 
 @app.route("/remove-book", methods=["GET"])
 def remove_book():
+    # form for search in navbar (since this is the same for all routes,
+    # except login and register, this should probably be set in the app.py
+    # file with other configuration stuff)
+    search_form = NavBarSearchForm()
 
     if request.args:
 
@@ -343,6 +358,10 @@ def remove_book():
 
 @app.route("/reading-history", methods=["GET", "POST"])
 def reading_history():
+    # form for search in navbar (since this is the same for all routes,
+    # except login and register, this should probably be set in the app.py
+    # file with other configuration stuff)
+    search_form = NavBarSearchForm()
 
     form = RateReviewForm()
 
@@ -352,7 +371,7 @@ def reading_history():
         book = Book.query.get(book_id)
 
         # send user to rating and review form
-        return render_template("rate-review.html", form=form, book=book)
+        return render_template("rate-review.html", form=form, search_form=search_form, book=book)
 
     if request.method == "POST":
 
@@ -383,7 +402,7 @@ def reading_history():
     
     history = list(zip(read_books, review_snippets))
 
-    return render_template("reading-history.html", history=history)
+    return render_template("reading-history.html", search_form=search_form, history=history)
 
 
 @app.route("/snooze", methods=["GET"])
@@ -409,9 +428,37 @@ def full_review():
 
         book = Book.query.get(request.args.get("id"))
 
-        return render_template("full-review.html", book=book)
+        return render_template("full-review.html", book=book, search_form=search_form)
         
     return redirect(url_for("reading_history"))
+
+# TODO: Set up Google Books API for search by title, author, keyword, ISBN (for students this is useful)
+# 'volumeInfo': ... '[industryIdentifiers': [{'identifier': '1840785284','type': 'ISBN_10'}, 
+#                         {'identifier': '9781840785289','type': 'ISBN_13'}]...]
+# Probably this should be a modal generated by a link on the navbar? Display results in a modal too, with an add btn?
+# Or a new view entirely with a handler here?
+
+@app.route("/search", methods=["GET", "POST"])
+def search():
+
+    nav_search_form = NavBarSearchForm()
+    search_form = SearchForm()
+    if request.method == "POST":
+        if nav_search_form.search_term.data:
+            search_type = "keyword"
+            search_term = nav_search_form.search_term.data
+            test = "NavBar Search Successful"
+        elif search_form.search_term.data:
+            search_type = search_form.search_type.data
+            search_term = search_form.search_term.data
+            test = "Search Page Search Successful"
+        
+        #perform search, render template with results
+    
+    return render_template("search.html", search_form=search_form, test=test)
+    
+
+
 
 if __name__ == "__main__":
     app.run()

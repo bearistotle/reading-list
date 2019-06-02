@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, TextAreaField, HiddenField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, AnyOf
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import IntegerField, SelectField, TextAreaField, HiddenField
+from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional
+from wtforms.validators import AnyOf
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[InputRequired(),
@@ -41,3 +43,17 @@ class RateReviewForm(FlaskForm):
     review = TextAreaField("Review", validators=[Optional(), Length(min=0, max=5000)])
     book_id = HiddenField() # better validators? # what to do on err?
     submit = SubmitField("Mark as Read")
+
+class SearchForm(FlaskForm):
+    search_type = SelectField("Search Type", choices=[("title", "Title"),
+                                                      ("author", "Author"),
+                                                      ("isbn", "ISBN"), 
+                                                      ("keyword", "Keyword")])
+    search_term = StringField("Search Term", validators=[InputRequired(),
+                                                        Length(min=2,max=120)])
+    submit = SubmitField("Search")
+
+class NavBarSearchForm(FlaskForm):
+    search_term = StringField(validators=[InputRequired(), 
+                                         Length(min=2, max=120)])
+    submit = SubmitField("Search")
