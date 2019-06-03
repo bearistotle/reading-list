@@ -29,7 +29,7 @@ class AddBookForm(FlaskForm):
     title = StringField("Title", validators=[InputRequired(), 
         Length(min=3, max=150)])
     author = StringField("Author (Last, First)", validators=[InputRequired(),
-        Length(min=3, max=120)])
+        Length(min=3, max=300)])
     category = SelectField("Category", choices=[(1, "5 Minutes to Kill"),
                            (2, "Relax/Escape"), (3, "Focused Learning")], coerce=int,
                            validators=[Optional(), AnyOf([1, 2, 3])])
@@ -43,18 +43,6 @@ class RateReviewForm(FlaskForm):
     review = TextAreaField("Review", validators=[Optional(), Length(min=0, max=5000)])
     book_id = HiddenField() # better validators? # what to do on err?
     submit = SubmitField("Mark as Read")
-
-"""
-class SearchForm(FlaskForm):
-    search_type = SelectField("Search Type", choices=[("title", "Title"),
-                                                      ("author", "Author"),
-                                                      ("isbn", "ISBN"), 
-                                                      ("keyword", "Keyword")])
-    search_term = StringField("Search Term", validators=[InputRequired(),
-                                                        Length(min=2,max=120)])
-    search_origin = HiddenField()
-    submit = SubmitField("Search")
-"""
 
 # values passed by select field options are formatted to fit with the google books api
 class SearchForm(FlaskForm):
