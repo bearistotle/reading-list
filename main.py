@@ -19,6 +19,7 @@ import json
 
 # TODO: change text of book title and author to proper capitalization on
 # display? (store lower?)
+# TODO: ensure db queries are not vulnerable to SQL injection attacks
 
 
 @app.before_request
@@ -42,51 +43,73 @@ def home():
     #get list of unread books by user and sort it by date_added
     book_list = Book.query.filter_by(user=user.id, read=False).all()
     book_list = sorted(book_list, key=lambda x: x.date_added)
+    print(book_list)
+    # TODO: add settings table and query for user settings to set theme
+    user_theme = "dark-theme"
+    all_categories = Category.query.all()
+    category_list = []
+    cat_styles = {}
 
+    for category in all_categories:
+        category_list.append(category.name)
+    
+    if user_theme == "light-theme":
+        color_list = [
+            "blue", 
+            "green", 
+            "yellow",
+            "purple", 
+            "red",  
+            "orange"
+        ]
+    
+    else:
+        color_list = [
+            "blue", 
+            "green", 
+            "purple", 
+            "red",  
+            "orange",
+            "yellow"
+        ]
+        
+    for i in range(0, len(category_list)):
 
+        cat_styles[category_list[i]] = user_theme + "-" + color_list[i] 
+
+    print(cat_styles)
+    # TODO: replace zipped lists with dictionary of book objects with category and style properties
     # if 3 or fewer books, display all books
     if len(book_list) <= 3:
 
-        category_list = []
-        [category_list.append(Category.query.filter_by(id=book.category).first()) for book in book_list]
+        book_categories = []
+        [book_categories.append(Category.query.filter_by(id=book.category).first()) for book in book_list]
     
         style_list = []
             
         # would this be better as a list comp? Prob not bc of multiple conditions?
-        for category in category_list:
-            if category.name == "5 Mins to Kill":
-                style = "table-success"
-            elif category.name == "Relax/Escape":
-                style = "table-info"
-            elif category.name == "Focused Learning":
-                style = "table-warning"
-            else:
-                style = "table-secondary"
-            
-            style_list.append(style)
+        for category in book_categories:
+
+            style_list.append(cat_styles[category.name])
 
         # note: need to wrap zip in list in Py 3x bc zip rtns iterable not list
         # (what is the difference? iterables don't support indexing?)
         current_list = list(zip(book_list, category_list, style_list))
 
-        return render_template("home.html", current=current_list, search_form=search_form)
+        return render_template("home.html", current=current_list, search_form=search_form, theme=user_theme)
 
     # if more than 3 books, display first book from ea category
     else:
 
         current_books = []
         i = 1
-        
-        # the initial problem with this loop was that it didn't start over from
-        #  the beginning when a book was appended. It could pass over the first 
-        # book in the cat before finding the first book in the previous cat
-        # and it won't come back to it. Now it just adds the first book a bunch.
-        # Finally fixed it! Not the best way probably
 
         # TODO: Refactor while loop to be more elegant/efficient. Perhaps use 
         # next()? Or define a helper function?
         while len(current_books) < 3:
+
             for book in book_list:
+
                 if book.category == i:
 
                     earlier_bk_in_cat = False
@@ -94,10 +117,12 @@ def home():
                     for tome in current_books:
 
                         if tome.category == i:
+
                             earlier_bk_in_cat = True
                             break
 
                     if earlier_bk_in_cat == False:
+
                         current_books.append(book)
                         break
 
@@ -107,17 +132,11 @@ def home():
         [category_list.append(Category.query.filter_by(id=book.category).first()) for book in current_books]
 
         style_list = []
+        # TODO: loop through categories and add style starting with blue, green, yellow,
+        # then red, purple, and orange. Do this by index in list, not name value
         for category in category_list:
-            if category.name == "5 Mins to Kill":
-                style = "table-success"
-            elif category.name == "Relax/Escape":
-                style = "table-info"
-            elif category.name == "Focused Learning":
-                style = "table-warning"
-            else:
-                style = "table-secondary"
             
-            style_list.append(style)
+            style_list.append(cat_styles[category.name])
 
         current_list = list(zip(current_books, category_list, style_list))
 
@@ -133,16 +152,8 @@ def home():
 
             style_list = []
             for category in category_list:
-                if category.name == "5 Mins to Kill":
-                    style = "table-success"
-                elif category.name == "Relax/Escape":
-                    style = "table-info"
-                elif category.name == "Focused Learning":
-                    style = "table-warning"
-                else:
-                    style = "table-secondary"
-
-                style_list.append(style)
+               
+                style_list.append(cat_styles[category.name])
             
             upcoming_list = list(zip(upcoming_books, category_list, style_list))
 
@@ -175,28 +186,23 @@ def home():
 
             style_list = []
             for category in category_list:
-                if category.name == "5 Mins to Kill":
-                    style = "table-success"
-                elif category.name == "Relax/Escape":
-                    style = "table-info"
-                elif category.name == "Focused Learning":
-                    style = "table-warning"
-                else:
-                    style = "table-secondary"
-
-                style_list.append(style)
+               
+                style_list.append(cat_styles[category.name])
             
             upcoming_list = list(zip(upcoming_books, category_list, style_list))
 
         return render_template("home.html", current=current_list,
-                               upcoming=upcoming_list,
-                               search_form=search_form)
+                                            upcoming=upcoming_list,
+                                            search_form=search_form,
+                                            theme=user_theme)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
     form = LoginForm()
+    user_theme = "dark-theme"
+
     if request.method == "GET":
         return render_template("login.html", title="Log In", form=form)
 
@@ -225,6 +231,7 @@ def login():
 def register():
 
     form = RegistrationForm()
+    user_theme = "dark-theme"
 
     if request.method == "GET":
         return render_template("register.html", title="Register", form=form)
@@ -282,6 +289,8 @@ def edit_list():
     # get user
     email = session["user"]
     user = User.query.filter_by(email=email).first()
+    user_theme = "dark-theme"
+
     book_list = Book.query.filter_by(user=user.id, read=False).all()
     category_list = []
     
@@ -302,7 +311,10 @@ def edit_list():
 
             return redirect(url_for("edit_list"))
 
-        return render_template("edit-list.html", form=form, search_form=search_form, list=book_category_list)
+        return render_template("edit-list.html", form=form,
+                                                 search_form=search_form,
+                                                 list=book_category_list, 
+                                                 theme=user_theme)
 
     if form.validate_on_submit():
 
@@ -330,8 +342,10 @@ def edit_list():
 
         flash(f"{error[1][0]}!", "error")
 
-    return render_template("edit-list.html", form=form, search_form=search_form,
-                           list=book_category_list)
+    return render_template("edit-list.html", form=form,
+                                             search_form=search_form,
+                                             list=book_category_list,
+                                             theme=user_theme)
 
 
 @app.route("/remove-book", methods=["GET"])
@@ -362,6 +376,7 @@ def reading_history():
     search_form = SearchForm()
 
     form = RateReviewForm()
+    user_theme = "dark-theme"
 
     if request.args.get("id"):
 
@@ -369,7 +384,10 @@ def reading_history():
         book = Book.query.get(book_id)
 
         # send user to rating and review form
-        return render_template("rate-review.html", form=form, search_form=search_form, book=book)
+        return render_template("rate-review.html", form=form,
+                                                   search_form=search_form,
+                                                   book=book,
+                                                   theme=user_theme)
 
     if request.method == "POST":
 
@@ -400,7 +418,9 @@ def reading_history():
     
     history = list(zip(read_books, review_snippets))
 
-    return render_template("reading-history.html", search_form=search_form, history=history)
+    return render_template("reading-history.html", search_form=search_form,
+                                                   history=history,
+                                                   theme=user_theme)
 
 
 @app.route("/snooze", methods=["GET"])
@@ -425,8 +445,10 @@ def full_review():
     if request.args:
 
         book = Book.query.get(request.args.get("id"))
-
-        return render_template("full-review.html", book=book, search_form=search_form)
+        user_theme = "dark-theme"
+        return render_template("full-review.html", book=book,
+                                                   search_form=search_form,
+                                                   theme=user_theme)
         
     return redirect(url_for("reading_history"))
 
@@ -439,7 +461,7 @@ def search_results():
     search_type = search_form.search_type.data
     search_term = search_form.search_term.data
     query = search_type + "+" + search_term
-
+    user_theme = "dark-theme"
 
     # access credentials file to get API_KEY
     with open("credentials.json") as creds:
@@ -463,24 +485,43 @@ def search_results():
 
     for book in response.get('items', []):
 
-        title = book["volumeInfo"]["title"]
-        authors = book["volumeInfo"]["authors"]
-        num_authors = len(book["volumeInfo"]["authors"])
+        # null checks for fields used
 
-        if book["volumeInfo"].get("industryIdentifiers"):
+        try:
+            title = book["volumeInfo"]["title"]
+        
+        except KeyError as e:
 
-            if book["volumeInfo"]["industryIdentifiers"][0].get("identifier"):
+            title = "No title found."
+            print(e)       
 
-                isbn_13 = book["volumeInfo"]["industryIdentifiers"][0]["identifier"]
+        try:
+        
+            authors = book["volumeInfo"]["authors"]
+            num_authors = len(book["volumeInfo"]["authors"])
 
-        else:
-            isbn_13 = "No ISBN-13 available."
+        except KeyError as e:
+
+            authors = "No authors listed."
+            num_authors = 0
+            print(e)
+
+        try:
+            industry_identifiers = book["volumeInfo"]["industryIdentifiers"]
+
+            isbn_13 = industry_identifiers[0].get("identifier")
+
+        except KeyError as e:
+                isbn_13 = "No ISBN-13 available."
+                print(e)
 
         results.append({"title": title, "authors": authors, "num_authors": num_authors, "isbn_13": isbn_13})
 
 
     return render_template("search-results.html", search_form=search_form,
-                           add_book_form=add_book_form, results=results)
+                                                  add_book_form=add_book_form,
+                                                  results=results,
+                                                  theme=user_theme)
     
 
 if __name__ == "__main__":

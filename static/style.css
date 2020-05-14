@@ -1,14 +1,134 @@
-.table-scroll tbody{
+.table-scroll tbody
+{
     position: absolute;
     overflow-y: scroll;
     height: 200%;
 }
 
-.absolute{
+.absolute
+{
     position: absolute;
 }
 
-.relative{
+.relative
+{
     position: relative;
     top: 300px;
+}
+
+/* 
+// Bootstrap Hex Values
+// Colors
+$blue:    #007bff !default; // primary
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #e83e8c !default;
+$red:     #dc3545 !default; // danger
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default; // warning
+$green:   #28a745 !default; // success
+$teal:    #20c997 !default;
+$cyan:    #17a2b8 !default; // info
+
+// Grays
+$white:    #fff !default;
+$gray-100: #f8f9fa !default; // light
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #868e96 !default; // secondary
+$gray-700: #495057 !default;
+$gray-800: #343a40 !default; // dark
+$gray-900: #212529 !default;
+$black:    #000 !default;
+*/
+
+.light-theme-primary
+{
+    background-color: #fff;
+
+}
+
+
+.light-theme-secondary
+{
+    background-color: #b1bace ;
+}
+
+
+.light-theme-blue
+{
+    background-color: #bbdefb;
+}
+
+
+.light-theme-purple
+{
+    background-color: #d1c4e9;
+}
+
+
+.light-theme-red
+{
+    background-color: #ffcdd2;
+}
+
+
+.light-theme-green
+{
+    background-color: #c8e6c9;
+}
+
+
+.light-theme-yellow
+{
+    background-color: #fff9c4;
+}
+
+
+.light-theme-orange
+{
+    background-color: #fd7e14;
+}
+
+.dark-theme-primary
+{
+    background-color: #212121;
+}
+
+.dark-theme-secondary
+{
+    background-color: #2e2e2e;
+    color: #fff;
+}
+
+.dark-theme-blue
+{
+    background-color: #64b5f6;
+}
+
+.dark-theme-purple
+{
+    background-color: #9575cd;
+}
+
+.dark-theme-red
+{
+    background-color: #e57373;
+}
+
+.dark-theme-green
+{
+    background-color: #66bb6a;
+}
+
+.dark-theme-yellow
+{
+    background-color: #ffee58;
+}
+
+.dark-theme-orange
+{
+    background-color: #ffa726;
 }
