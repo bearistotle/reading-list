@@ -2,28 +2,53 @@
 {% block content %}
 <h2>Reading History</h2>
 {% if history[0] %}
-<table class="table table-hover table-striped">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Author</th>
-      <th>Rating</th>
-      <th>Review</th>
-      <th>Date Read</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for book in history %}
-    <tr>
-      <td>{{ book[0].title }}</td>
-      <td>{{ book[0].author }}</td>
-      <td>{{ book[0].rating }}</td>
-      <td>{{ book[1] }}<a href="/full-review?id={{ book[0].id }}">. . .</a></td>
-      <td>{{ book[0].date_read }}</td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+  {% if theme == "light-theme" or theme == "" %}
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Rating</th>
+        <th>Review</th>
+        <th>Date Read</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for book in history %}
+      <tr class="{{ book[2] }}">
+        <td>{{ book[0].title }}</td>
+        <td>{{ book[0].author }}</td>
+        <td>{{ book[0].rating }}</td>
+        <td>{{ book[1] }}<a href="/full-review?id={{ book[0].id }}">. . .</a></td>
+        <td>{{ book[0].date_read }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <table class="table table-dark table-hover">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Rating</th>
+        <th>Review</th>
+        <th>Date Read</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for book in history %}
+      <tr class="{{ book[2] }}">
+        <td>{{ book[0].title }}</td>
+        <td>{{ book[0].author }}</td>
+        <td>{{ book[0].rating }}</td>
+        <td>{{ book[1] }}<a href="/full-review?id={{ book[0].id }}">. . .</a></td>
+        <td>{{ book[0].date_read }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
 {% else %}
 <h3>You haven't read any books yet!</h3>
 {% endif %}

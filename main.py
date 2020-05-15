@@ -441,14 +441,50 @@ def reading_history():
     # form data has been validated and db has been updated
     user_email = session["user"]
     user = User.query.filter_by(email=user_email).first()
-    read_books = Book.query.filter_by(user=user.id, read=True).all()
-
+    books_read = Book.query.filter_by(user=user.id, read=True).all()
+    cat_styles = {}
+    # TODO: Update category query for multiple users w/ custom categories
+    user_categories = Category.query.all()
     review_snippets = []
-    for book in read_books:
+    category_list = []
+    style_list = []
+
+    for book in books_read:
         snippet = book.review[:200]
         review_snippets.append(snippet)
+
+    if user_theme == "light-theme":
+
+        color_list = [
+            "blue", 
+            "green", 
+            "yellow",
+            "purple", 
+            "red",  
+            "orange"
+        ]
+
+    else:
+
+        color_list = [
+            "blue", 
+            "green", 
+            "purple", 
+            "red",  
+            "orange",
+            "yellow"
+        ]
+        
+    for i in range(0, len(user_categories)):
+
+        cat_styles[user_categories[i].name] = user_theme + "-" + color_list[i] 
     
-    history = list(zip(read_books, review_snippets))
+    [category_list.append(Category.query.filter_by(id=book.category).first())
+    for book in books_read]
+            
+    [style_list.append(cat_styles[category.name]) for category in category_list]
+    
+    history = list(zip(books_read, review_snippets, style_list))
 
     return render_template("reading-history.html", search_form=search_form,
                                                    history=history,
