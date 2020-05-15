@@ -77,9 +77,9 @@ def home():
 
         cat_styles[category_list[i]] = user_theme + "-" + color_list[i] 
 
-    print(cat_styles)
     # TODO: replace zipped lists with dictionary of book objects with category and style properties
     # if 3 or fewer books, display all books
+    # TODO: reconsider why there is a separate process for 3 or fewer books
     if len(book_list) <= 3:
 
         book_categories = []
@@ -281,29 +281,61 @@ def logout():
 @app.route("/edit-list", methods=["GET", "POST"])
 def edit_list():
 
-    # form for search in navbar (since this is the same for all routes,
-    # except login and register, this should probably be set in the app.py
-    # file with other configuration stuff)
+    # form for search in navbar
     search_form = SearchForm()
 
     # get user
     email = session["user"]
     user = User.query.filter_by(email=email).first()
     user_theme = "dark-theme"
+    cat_styles = {}
+    # TODO: Update category query for multiple users w/ custom categories
+    user_categories = Category.query.all()
 
+    if user_theme == "light-theme":
+
+        color_list = [
+            "blue", 
+            "green", 
+            "yellow",
+            "purple", 
+            "red",  
+            "orange"
+        ]
+
+    else:
+
+        color_list = [
+            "blue", 
+            "green", 
+            "purple", 
+            "red",  
+            "orange",
+            "yellow"
+        ]
+        
+    for i in range(0, len(user_categories)):
+
+        cat_styles[user_categories[i].name] = user_theme + "-" + color_list[i] 
+    
     book_list = Book.query.filter_by(user=user.id, read=False).all()
     category_list = []
+    style_list = []
     
     [category_list.append(Category.query.filter_by(id=book.category).first())
     for book in book_list]
-
-    book_category_list = list(zip(book_list, category_list))
+            
+    [style_list.append(cat_styles[category.name]) for category in category_list]
+    
+    # note: need to wrap zip in list in Py 3x bc zip rtns iterable not list
+    full_list = list(zip(book_list, category_list, style_list))
 
     form = AddBookForm()
 
     if request.method == "GET":
 
         if request.args:
+
             book = Book.query.filter_by(id=request.args.get("book_id")).first()
             book.category = int(request.args.get("category_id"))
 
@@ -313,7 +345,7 @@ def edit_list():
 
         return render_template("edit-list.html", form=form,
                                                  search_form=search_form,
-                                                 list=book_category_list, 
+                                                 list=full_list, 
                                                  theme=user_theme)
 
     if form.validate_on_submit():
@@ -344,7 +376,7 @@ def edit_list():
 
     return render_template("edit-list.html", form=form,
                                              search_form=search_form,
-                                             list=book_category_list,
+                                             list=full_list,
                                              theme=user_theme)
 
 

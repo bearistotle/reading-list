@@ -2,6 +2,7 @@
 {% block content %}
 <div class="container absolute">
   <h2>Edit List</h2>
+  {% if theme == "light-theme" or theme == "" %}
   <table class="table table-condensed table-hover table-scroll">
     <thead>
       <tr>
@@ -11,17 +12,8 @@
       </tr>
     </thead>
     <tbody>
-    <!-- Color code row for ea book based on category -->
     {% for book in list %}
-      {% if book[1].name is eq("5 Mins to Kill") %}
-        <tr class="table-success">
-      {% elif book[1].name is eq("Relax/Escape") %}
-        <tr class="table-info">
-      {% elif book[1].name is eq("Focused Learning") %}
-      <tr>
-        <tr class="table-warning">
-      {% else %}
-      {% endif %}
+      <tr class="{{ book[2] }}">
         <td>{{ book[0].title }}</td>
         <td>{{ book[0].author }}</td>
         <td>{{ book[1].name }}</td>
@@ -88,5 +80,84 @@
       </div>
     </div>
   </div>
+  {% else %}
+  <table class="table table-dark table-condensed table-hover table-scroll">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for book in list %}
+      <tr class="{{ book[2] }}">
+        <td>{{ book[0].title }}</td>
+        <td>{{ book[0].author }}</td>
+        <td>{{ book[1].name }}</td>
+        <td>
+          <div class="dropdown">
+              <button class="btn {{ book[2] }} dropdown-toggle" type="button"
+              id="btn-dropdown" data-toggle="dropdown">{{ book[1].name }}</button>
+              <div class="dropdown-menu {{ book[2] }}" aria-labelledby="btn-dropdown">
+                <a class="dropdown-item {{ book[2] }}" href="/edit-list?book_id={{ book[0].id }}&category_id=1">5 Mins to Kill</a>
+                <a class="dropdown-item {{ book[2] }}" href="/edit-list?book_id={{ book[0].id }}&category_id=2">Relax/Escape</a>
+                <a class="dropdown-item {{ book[2] }}" href="/edit-list?book_id={{ book[0].id }}&category_id=3">Focused Learning</a>
+              </div>
+            </div>
+        </td>
+        <td>
+          <div class="btn-group">
+            <a href="/reading-history?id={{ book[0].id }}" class="btn btn-dark btn-sm">Finished</a>
+            <a href="/remove-book?id={{ book[0].id }}" class="btn btn-light btn-sm">Remove</a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="relative">
+    <button type="button" class="btn btn-outline-primary add-book-btn" data-toggle="modal"
+      data-target="#addbookModal">Add Book</button>
+    <div class="modal fade" id="addbookModal" tab-index="-1" role="dialog"
+      arialabelledby="addbookModalLabel" aria-hidden="true">
+      <div class="modal-dialog dark-theme-primary" role="document">
+        <div class="modal-content">
+          <div class="modal-header dark-theme-primary">
+            <h5 class="modal-title" id="addbookModalLable">Add Book</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-lable="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body dark-theme-primary">
+            <form id="add-book" action="" method="POST">
+              {{ form.hidden_tag() }}
+              <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                {{ form.title(class="form-control form-control-lg dark-theme-secondary") }}
+              </div>
+              <div class="form-group">
+                {{ form.author.label(class="form-control-label") }}
+                {{ form.author(class="form-control form-control-lg dark-theme-secondary") }}
+              </div>
+              <div class="form-group">
+                {{ form.category.label(class="form-control-label") }}
+                {{ form.category(class="form-control form-control-lg dark-theme-secondary") }}
+              </div>
+              <div class="form-group">
+                {{ form.isbn.label(class="form-control-label") }}
+                {{ form.isbn(class="form-control form-control-lg dark-theme-secondary") }}
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer dark-theme-primary">
+            <button type="submit" class="btn btn-outline-primary" form="add-book">Submit</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

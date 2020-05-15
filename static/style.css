@@ -95,6 +95,8 @@ $black:    #000 !default;
 .dark-theme-primary
 {
     background-color: #212121;
+    color: #fff;
+
 }
 
 .dark-theme-secondary
@@ -106,29 +108,41 @@ $black:    #000 !default;
 .dark-theme-blue
 {
     background-color: #64b5f6;
+    color: #fff;
+
 }
 
 .dark-theme-purple
 {
     background-color: #9575cd;
+    color: #fff;
+
 }
 
 .dark-theme-red
 {
     background-color: #e57373;
+    color: #fff;
+
 }
 
 .dark-theme-green
 {
     background-color: #66bb6a;
+    color: #fff;
+
 }
 
 .dark-theme-yellow
 {
     background-color: #ffee58;
+    color: #fff;
+
 }
 
 .dark-theme-orange
 {
     background-color: #ffa726;
+    color: #fff;
+
 }
